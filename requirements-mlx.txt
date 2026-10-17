@@ -1,0 +1,2 @@
+# Only for the experimental MLX trunk in experimental/. Not needed to predict structures.
+mlx==0.32.3

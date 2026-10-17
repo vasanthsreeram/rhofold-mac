@@ -1,0 +1,12 @@
+rhofold-mac
+Copyright 2026 Sreeram Vasanth
+
+This product runs and patches RhoFold+ (https://github.com/ml4bio/RhoFold),
+licensed under the Apache License, Version 2.0. RhoFold+ code and weights are
+not redistributed here; setup.sh downloads them from the original sources.
+rhofold-mac-fast.patch contains modifications to RhoFold+ source files
+(rhofold/rhofold.py, rhofold/model/structure_module.py).
+
+examples/sample.fasta is copied from RhoFold+'s example inputs (example/input/6tb7A).
+
+Not affiliated with or endorsed by the RhoFold+ authors.

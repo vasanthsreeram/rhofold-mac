@@ -1,0 +1,24 @@
+{
+ "device": "mps",
+ "fasta": "3meiA.fasta",
+ "L": 23,
+ "msa_depth": 1,
+ "mode": "single_seq",
+ "times": [
+  1.19166108299396,
+  1.2298435419943416,
+  1.1412537079886533,
+  1.2015251660050126,
+  1.1711847919941647
+ ],
+ "median": 1.19166108299396,
+ "min": 1.1412537079886533,
+ "threads": 4,
+ "fast": false,
+ "compile": false,
+ "peak_footprint_gb": 1.870382592,
+ "warmup_s": 1.4526019170007203,
+ "peak_rss_gb": 1.2611584,
+ "mean_plddt": 0.7144807577133179,
+ "mps_driver_alloc_gb": 1.245413376
+}

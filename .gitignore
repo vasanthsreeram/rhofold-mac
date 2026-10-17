@@ -1,0 +1,24 @@
+# Upstream checkout and weights are fetched by setup.sh, never committed
+/RhoFold/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npz
+*.npy
+# Environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+# Outputs
+out*/
+output/
+*.pdb
+*.ct
+# Secrets and local notes
+.env
+.env.*
+AGENTS.md
+CLAUDE.md
+.DS_Store

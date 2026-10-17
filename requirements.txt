@@ -1,0 +1,7 @@
+# Pinned versions tested on an Apple M4 (macOS 15.5, Python 3.12).
+torch==2.14.1
+numpy==2.5.4
+einops==0.8.2
+ml-collections==1.1.0
+biopython==1.88
+matplotlib==3.11.2

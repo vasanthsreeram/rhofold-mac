@@ -1,0 +1,24 @@
+{
+ "device": "mps",
+ "fasta": "6tb7A.fasta",
+ "L": 52,
+ "msa_depth": 1,
+ "mode": "single_seq",
+ "times": [
+  2.873705833000713,
+  2.7888420410017716,
+  2.8753840410063276,
+  2.856975250004325,
+  2.8724601669964613
+ ],
+ "median": 2.8724601669964613,
+ "min": 2.7888420410017716,
+ "threads": 4,
+ "fast": false,
+ "compile": false,
+ "peak_footprint_gb": 1.875822104,
+ "warmup_s": 2.9746388329949696,
+ "peak_rss_gb": 1.264156672,
+ "mean_plddt": 0.5442860126495361,
+ "mps_driver_alloc_gb": 1.306230784
+}

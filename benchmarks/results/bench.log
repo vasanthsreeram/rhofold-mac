@@ -1,0 +1,19 @@
+== mps_fast_ss_3meiA
+{"device": "mps", "fasta": "3meiA.fasta", "L": 23, "msa_depth": 1, "mode": "single_seq", "median": 0.8667604999936884, "min": 0.8340007919905474, "threads": 4, "fast": true, "compile": false, "peak_footprint_gb": 1.874708016, "warmup_s": 1.0026095000066562, "peak_rss_gb": 1.264648192, "mean_plddt": 0.7144807577133179, "mps_driver_alloc_gb": 1.24542976}
+== mps_fast_ss_6tb7A
+{"device": "mps", "fasta": "6tb7A.fasta", "L": 52, "msa_depth": 1, "mode": "single_seq", "median": 1.5010366670030635, "min": 1.4659249579999596, "threads": 4, "fast": true, "compile": false, "peak_footprint_gb": 1.870939648, "warmup_s": 1.8292171659995802, "peak_rss_gb": 1.263386624, "mean_plddt": 0.5442860126495361, "mps_driver_alloc_gb": 1.299955712}
+== mps_fast_ss_4l81A
+{"device": "mps", "fasta": "4l81A.fasta", "L": 96, "msa_depth": 1, "mode": "single_seq", "median": 3.5389384159934707, "min": 3.4847427920030896, "threads": 4, "fast": true, "compile": false, "peak_footprint_gb": 2.673854024, "warmup_s": 4.186098124991986, "peak_rss_gb": 1.263910912, "mean_plddt": 0.5855653882026672, "mps_driver_alloc_gb": 2.348531712}
+== mps_fast_ss_4P8Z
+{"device": "mps", "fasta": "4P8Z.fasta", "L": 188, "msa_depth": 1, "mode": "single_seq", "median": 16.254145416998654, "min": 16.16338879200339, "threads": 4, "fast": true, "compile": false, "peak_footprint_gb": 7.049643592, "warmup_s": 16.294423833009205, "peak_rss_gb": 1.264123904, "mean_plddt": 0.5246889591217041, "mps_driver_alloc_gb": 6.689636352}
+== mps_fast_ss_7EZ0
+{"device": "mps", "fasta": "7EZ0.fasta", "L": 387, "msa_depth": 1, "mode": "single_seq", "median": 83.35172979200433, "min": 82.7801545830007, "threads": 4, "fast": true, "compile": false, "peak_footprint_gb": 10.731587312, "warmup_s": 81.55250108300243, "peak_rss_gb": 1.2640256, "mean_plddt": 0.2473430335521698, "mps_driver_alloc_gb": 10.128965632}
+== mps_off_ss_3meiA
+{"device": "mps", "fasta": "3meiA.fasta", "L": 23, "msa_depth": 1, "mode": "single_seq", "median": 1.19166108299396, "min": 1.1412537079886533, "threads": 4, "fast": false, "compile": false, "peak_footprint_gb": 1.870382592, "warmup_s": 1.4526019170007203, "peak_rss_gb": 1.2611584, "mean_plddt": 0.7144807577133179, "mps_driver_alloc_gb": 1.245413376}
+== mps_off_ss_6tb7A
+{"device": "mps", "fasta": "6tb7A.fasta", "L": 52, "msa_depth": 1, "mode": "single_seq", "median": 2.8724601669964613, "min": 2.7888420410017716, "threads": 4, "fast": false, "compile": false, "peak_footprint_gb": 1.875822104, "warmup_s": 2.9746388329949696, "peak_rss_gb": 1.264156672, "mean_plddt": 0.5442860126495361, "mps_driver_alloc_gb": 1.306230784}
+== mps_off_ss_4l81A
+{"device": "mps", "fasta": "4l81A.fasta", "L": 96, "msa_depth": 1, "mode": "single_seq", "median": 7.573827874992276, "min": 7.39668287501263, "threads": 4, "fast": false, "compile": false, "peak_footprint_gb": 2.683946688, "warmup_s": 7.61398699998972, "peak_rss_gb": 1.26418944, "mean_plddt": 0.5855653882026672, "mps_driver_alloc_gb": 2.348515328}
+== mps_off_ss_4P8Z
+{"device": "mps", "fasta": "4P8Z.fasta", "L": 188, "msa_depth": 1, "mode": "single_seq", "median": 29.011746167001547, "min": 28.98707570899569, "threads": 4, "fast": false, "compile": false, "peak_footprint_gb": 6.606947984, "warmup_s": 29.518031416999293, "peak_rss_gb": 1.264500736, "mean_plddt": 0.5246889591217041, "mps_driver_alloc_gb": 6.253412352}
+== mps_off_ss_7EZ0
