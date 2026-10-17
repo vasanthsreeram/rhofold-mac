@@ -2,22 +2,13 @@
 
 **RhoFold+ on Apple Silicon via PyTorch MPS; MLX path experimental.**
 
-[RhoFold+](https://github.com/ml4bio/RhoFold) (Shen et al., *Nature Methods* 2024) predicts RNA 3D structure from sequence. Upstream supports Linux and says *"MacOS is currently not supported"*. This repo is a small runner that sets it up on an M-series Mac in one command and runs it on the Apple GPU through PyTorch's MPS (Metal) backend, with a CPU fallback. To our knowledge it is the first public Mac-friendly RhoFold+ runner.
+Predict an RNA's 3D structure from its sequence on an M-series Mac, on the Apple GPU, with the official [RhoFold+](https://github.com/ml4bio/RhoFold) model. One setup command, one run command.
 
-It is not a re-implementation. `setup.sh` clones the official RhoFold code at a fixed commit, applies a small patch (`rhofold-mac-fast.patch`), and downloads the official weights from the authors' Hugging Face repo. The model, weights and predictions are the authors'.
+## Quick start
 
-Not affiliated with the RhoFold+ authors or CUHK.
+**You need:** a Mac with Apple Silicon (M1 or newer), macOS 12.3+ (tested on 15.5), git (`xcode-select --install`), about 3 GB free disk, and an internet connection for the one-time download. Python is handled for you if [uv](https://docs.astral.sh/uv/) is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`); otherwise any Python 3.10+ works.
 
-## Requirements
-
-- Mac with Apple Silicon (M1 or newer). Intel Macs are not supported.
-- macOS 12.3 or newer (needed for MPS). Tested on macOS 15.5, Apple M4, 16 GB.
-- Python 3.10+ ([uv](https://docs.astral.sh/uv/) recommended: `setup.sh` then fetches Python 3.12 itself). Tested with Python 3.12 and PyTorch 2.14.1.
-- git and curl (`xcode-select --install` if missing).
-- About 3 GB free disk: ~0.5 GB weights, ~1.5 GB Python environment, ~0.1 GB RhoFold code.
-- Memory: an 8 GB Mac is fine for short RNAs. Peak memory measured on the M4 was 1.9 GB at 23–52 nt, 2.7 GB at 96 nt, 7.0 GB at 188 nt and 10.7 GB at 387 nt (see [Benchmarks](#benchmarks)).
-
-## Install
+**1. Set up (once):**
 
 ```bash
 git clone https://github.com/vasanthsreeram/rhofold-mac.git
@@ -25,30 +16,43 @@ cd rhofold-mac
 ./setup.sh
 ```
 
-`setup.sh` creates `.venv` with pinned packages (`requirements.txt`), clones `ml4bio/RhoFold` at commit `6bdfbda` into `RhoFold/`, applies the patch, downloads `rhofold_pretrained_params.pt` (508 MB) from [huggingface.co/cuhkaih/rhofold](https://huggingface.co/cuhkaih/rhofold) and checks its SHA-256. It is safe to re-run; a broken download resumes.
+It downloads about 0.5 GB of weights plus the Python packages. On a fast connection it took 25 s here (fresh clone, empty package cache); expect a few minutes on a slower one. It ends with a self-check that should say `All good`.
 
-## Quick start
-
-A 52-nt sample is included: `examples/sample.fasta` is RNA chain A of PDB entry [6TB7](https://www.rcsb.org/structure/6TB7), copied from RhoFold's own example inputs (`example/input/6tb7A`).
+**2. Fold the bundled sample:**
 
 ```bash
-./run.sh examples/sample.fasta out/
+./run.sh
 ```
 
-Expected output:
+With no arguments it folds `examples/sample.fasta`, a 52-nt RNA (chain A of PDB entry [6TB7](https://www.rcsb.org/structure/6TB7), copied from RhoFold's own example inputs), on the Apple GPU. Expected output on an M4 MacBook (16 GB):
 
 ```
 RhoFold+ | sample.fasta | 52 nt | single-sequence | device=mps | fast=True
-Model load 1.1 s | prediction 2.3 s | mean pLDDT 0.544
-Wrote out/unrelaxed_model.pdb (+ ss.ct, results.npz, run_info.json)
-Total wall time (Python start-up + model load + prediction): 4 s
+Model load 1.2 s | prediction 2.2 s | mean pLDDT 0.544
+Wrote out/sample/unrelaxed_model.pdb (+ ss.ct, results.npz, run_info.json)
+View it: drag out/sample/unrelaxed_model.pdb onto https://molstar.org/viewer, or open it in PyMOL / ChimeraX.
+Total wall time (Python start-up + model load + prediction): 8 s
 ```
 
-Those times are from an M4 MacBook (16 GB). The very first run after install takes a few seconds longer (about 9 s total here) while macOS caches the Python libraries. Open `out/unrelaxed_model.pdb` in PyMOL, ChimeraX or [molstar.org/viewer](https://molstar.org/viewer).
+The first run after setup took 8 s in total on this Mac, while macOS loads the Python libraries for the first time; later runs took 4 s. Prediction itself is 2.2–2.7 s.
 
-Your own RNA: put one sequence (A, U, G, C) in a FASTA file and run `./run.sh my_rna.fasta out_my_rna/`.
+**3. Look at the result.** Everything lands in `out/sample/`. Drag `out/sample/unrelaxed_model.pdb` onto [molstar.org/viewer](https://molstar.org/viewer) in your browser (nothing to install), or open it in PyMOL or ChimeraX. Colour by B-factor to see per-residue confidence (pLDDT, 0–100).
 
-### Outputs
+**Your own RNA:** put one sequence (A, U, G, C) in a FASTA file and run `./run.sh my_rna.fasta`. Results go to `out/my_rna/`; add a second argument to choose the folder (`./run.sh my_rna.fasta results/`).
+
+**Something wrong?** Run `./doctor.sh`. It checks the Mac, Python, PyTorch and the Apple GPU, the RhoFold code and patch, and the weights' checksum, and says what to do for anything that fails. See also [Troubleshooting](#troubleshooting).
+
+## What this is
+
+[RhoFold+](https://github.com/ml4bio/RhoFold) (Shen et al., *Nature Methods* 2024) predicts RNA 3D structure from sequence. Upstream supports Linux and says *"MacOS is currently not supported"*. This repo sets it up on an M-series Mac in one command and runs it on the Apple GPU through PyTorch's MPS (Metal) backend, with a CPU fallback. To our knowledge it is the first public Mac-friendly RhoFold+ runner.
+
+It is not a re-implementation. `setup.sh` creates `.venv` with pinned packages (`requirements.txt`), clones `ml4bio/RhoFold` at commit `6bdfbda` into `RhoFold/`, applies a small patch (`rhofold-mac-fast.patch`), downloads `rhofold_pretrained_params.pt` from the authors' [Hugging Face repo](https://huggingface.co/cuhkaih/rhofold) and checks its SHA-256. It is safe to re-run, and a broken download resumes. The model, weights and predictions are the authors'.
+
+Not affiliated with the RhoFold+ authors or CUHK.
+
+**Memory:** an 8 GB Mac is fine for short RNAs. Peak memory on the M4 was 1.9 GB at 23–52 nt, 2.7 GB at 96 nt, 7.0 GB at 188 nt and 10.7 GB at 387 nt (see [Benchmarks](#benchmarks)).
+
+## Outputs
 
 | File | What |
 |---|---|
@@ -57,15 +61,16 @@ Your own RNA: put one sequence (A, U, G, C) in a FASTA file and run `./run.sh my
 | `results.npz` | Distance distributions (`dist_n`, `dist_p`, `dist_c`), base-pair probability map, pLDDT |
 | `run_info.json` | Length, device, timings, mean pLDDT, torch version |
 
-### Options
+## Options
 
 ```
-./run.sh <input.fasta> <out_dir> [--a3m MSA.a3m] [--device auto|mps|cpu] [--official]
+./run.sh [input.fasta] [out_dir] [--a3m MSA.a3m] [--device auto|mps|cpu] [--official]
 ```
 
-- **Single-sequence mode by default.** Upstream builds an MSA with BLAST and Infernal against RNAcentral and NCBI nt (hundreds of GB). That is skipped here: the sequence itself is used as the MSA, as in upstream's `--single_seq_pred True`. This keeps the sample under a minute but is usually less accurate than an MSA. If you have an MSA (e.g. from the [RhoFold+ web server](https://proj.cse.cuhk.edu.hk/aihlab/RhoFold/) or your own search), pass it with `--a3m`.
+- No `input.fasta`: the bundled sample. No `out_dir`: `out/<input name>/`.
+- **Single-sequence mode by default.** Upstream builds an MSA with BLAST and Infernal against RNAcentral and NCBI nt (hundreds of GB). That is skipped here: the sequence itself is used as the MSA, as in upstream's `--single_seq_pred True`. This keeps the sample to a few seconds but is usually less accurate than an MSA. If you have an MSA (e.g. from the [RhoFold+ web server](https://proj.cse.cuhk.edu.hk/aihlab/RhoFold/) or your own search), pass it with `--a3m`.
 - **No Amber relaxation.** Upstream's optional relaxation needs OpenMM; the output is the unrelaxed model (the same file upstream writes before relaxing).
-- `--device` defaults to `auto`: MPS if available, otherwise CPU.
+- `--device` defaults to `auto`: the Apple GPU (MPS) if available, otherwise the CPU (it prints a note when it falls back).
 - `--official` turns off the speed patch and runs upstream's code path unchanged.
 
 ## What the patch changes
@@ -88,20 +93,24 @@ Measured on an Apple M4 MacBook (16 GB, 2026-10-14, PyTorch 2.14.1, MPS). Networ
 | 4P8Z | 188 nt | 29.0 s | 16.3 s | 7.0 GB |
 | 7EZ0 | 387 nt | did not complete (no result recorded) | 83.4 s | 10.7 GB |
 
-The quick-start "prediction" time (2.3 s for the sample) is a single cold run including moving inputs to the GPU, so it is a bit above the warmed-up 1.50 s in the table.
+The quick-start "prediction" time for the sample is a single cold run including moving inputs to the GPU, so it is a bit above the warmed-up 1.50 s in the table.
 
 ## Troubleshooting
 
-- **`MPS (Apple GPU) not available, running on CPU`**: you are on an Intel Mac, macOS older than 12.3, or an x86 Python under Rosetta. Check `python -c "import platform; print(platform.machine())"` prints `arm64`. Delete `.venv` and re-run `./setup.sh` from a native (non-Rosetta) terminal.
-- **Out of memory on MPS** (`MPS backend out of memory`): close other apps, or run on CPU with `--device cpu` (slower, uses normal RAM and swap). Long RNAs (300+ nt) need 10+ GB.
-- **`need Python 3.10+`**: macOS's built-in `python3` is 3.9. Install uv (`curl -LsSf https://astral.sh/uv/install.sh | sh`) and re-run `./setup.sh`.
-- **Download interrupted or checksum mismatch**: re-run `./setup.sh`; it resumes or re-downloads.
-- **`patch did not apply`**: you edited files in `RhoFold/`. Delete the `RhoFold/` folder and re-run `./setup.sh` (the weights download again too, or move `RhoFold/pretrained/RhoFold_pretrained.pt` aside first and put it back).
+Start with `./doctor.sh`: it names the problem and the fix. The common ones:
+
+- **`Note: MPS (Apple GPU) not available, running on CPU instead`**: the run still works, just slower. Causes: an Intel Mac (not supported), macOS older than 12.3, or a terminal running under Rosetta (x86 emulation). For Rosetta: Finder > Applications > Utilities > Terminal > Get Info > untick "Open using Rosetta", then delete `.venv` and re-run `./setup.sh`.
+- **`need Python 3.10+`**: macOS's built-in `python3` is 3.9. Install uv (`curl -LsSf https://astral.sh/uv/install.sh | sh`), open a new terminal and re-run `./setup.sh`.
+- **`weights download failed`**: network, proxy or Hugging Face trouble. Re-run `./setup.sh` to resume; the message also prints the URL to download by hand and where to save it.
+- **`downloaded weights are damaged (SHA-256 mismatch)`** or **`could not load the weights`**: the file is deleted or flagged; re-run `./setup.sh` to fetch it again.
+- **`sequence contains 'T'`** (or other letters): RhoFold+ takes RNA letters A, U, G, C only. Replace T with U.
+- **Out of memory on the GPU** (`MPS backend out of memory`): close other apps, or use `--device cpu` (slower, uses normal RAM and swap). RNAs of 300+ nt need 10+ GB.
+- **`patch did not apply`** / **`RhoFold/ is not at 6bdfbda`**: files in `RhoFold/` were edited. Move `RhoFold/pretrained/RhoFold_pretrained.pt` aside, delete `RhoFold/`, re-run `./setup.sh`, and put the weights back (or let it download them again).
 - **Torch warnings** about deprecated functions come from upstream code and are harmless.
 
-## Experimental: MLX trunk
+## Experimental: MLX trunk (off by default)
 
-`experimental/mlx_e2eformer.py` is an [MLX](https://github.com/ml-explore/mlx) port of RhoFold+'s E2Eformer trunk only (the 12 attention blocks), for comparing numerics and speed against PyTorch. It reads the PyTorch checkpoint at runtime; there are no converted MLX weights, and it does not produce structures.
+Not installed or used unless you ask for it: `./setup.sh` and `./run.sh` are PyTorch only. `experimental/mlx_e2eformer.py` is an [MLX](https://github.com/ml-explore/mlx) port of RhoFold+'s E2Eformer trunk only (the 12 attention blocks), for comparing numerics and speed against PyTorch. It reads the PyTorch checkpoint at runtime; there are no converted MLX weights, and it does not produce structures.
 
 **It does not match PyTorch yet.** Its built-in check compares the trunk outputs against the official PyTorch trunk on the same inputs. On 2026-10-17 (fresh clone, M4) the relative error was 0.27–0.41 on the 52-nt sample and 0.36–0.65 on 4P8Z (188 nt), so there is a bug in the port and its timings mean nothing until that is fixed. Use the PyTorch MPS runner above for predictions.
 

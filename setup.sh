@@ -20,7 +20,9 @@ die() { printf '\033[31mError:\033[0m %s\n' "$*" >&2; exit 1; }
 
 # --- 0. checks -------------------------------------------------------------
 [ "$(uname -s)" = Darwin ] || die "this runner is for macOS on Apple Silicon (for Linux/CUDA use upstream RhoFold)."
-[ "$(uname -m)" = arm64 ] || die "needs an Apple Silicon Mac (M1 or newer). If you are on one, make sure your terminal is not running under Rosetta."
+[ "$(sysctl -n sysctl.proc_translated 2>/dev/null)" = 1 ] && die "this terminal runs under Rosetta (x86 emulation), so PyTorch would not see the Apple GPU. Open a native Terminal (Finder > Terminal > Get Info > untick 'Open using Rosetta') and re-run ./setup.sh"
+[ "$(uname -m)" = arm64 ] || die "needs an Apple Silicon Mac (M1 or newer). Intel Macs are not supported."
+[ "$(sw_vers -productVersion | cut -d. -f1)" -ge 13 ] || echo "Warning: macOS $(sw_vers -productVersion). The Apple GPU (MPS) needs 12.3+; tested on 15.5. Older systems fall back to the CPU." >&2
 command -v git >/dev/null || die "git not found. Run: xcode-select --install"
 command -v curl >/dev/null || die "curl not found."
 free_gb=$(df -g . | awk 'NR==2 {print $4}')
@@ -73,15 +75,14 @@ if [ -f "$WEIGHTS" ] && check_sha "$WEIGHTS"; then
 else
   say "Downloading RhoFold+ weights (~508 MB) from huggingface.co/cuhkaih/rhofold"
   mkdir -p RhoFold/pretrained
-  curl -fL -# --retry 3 -C - -o "$WEIGHTS.part" "$WEIGHTS_URL" || die "download failed; re-run ./setup.sh to resume."
-  check_sha "$WEIGHTS.part" || { rm -f "$WEIGHTS.part"; die "checksum mismatch on downloaded weights (file removed); re-run ./setup.sh"; }
+  curl -fL -# --retry 3 -C - -o "$WEIGHTS.part" "$WEIGHTS_URL" || die "weights download failed (network, proxy, or Hugging Face down).
+  Re-run ./setup.sh to resume where it stopped. Or download by hand in a browser:
+    $WEIGHTS_URL
+  and save it as $(pwd)/$WEIGHTS"
+  check_sha "$WEIGHTS.part" || { rm -f "$WEIGHTS.part"; die "the downloaded weights are damaged (SHA-256 mismatch), so they were deleted. Re-run ./setup.sh to download again."; }
   mv "$WEIGHTS.part" "$WEIGHTS"
 fi
 
-# --- 4. Smoke check -----------------------------------------------------------
-.venv/bin/python - <<'EOF'
-import torch
-mps = torch.backends.mps.is_available()
-print(f"torch {torch.__version__} | MPS (Apple GPU) available: {mps}" + ("" if mps else "  -> will run on CPU (slower)"))
-EOF
-say "Setup done. Try:  ./run.sh examples/sample.fasta out/"
+# --- 4. Self-check -------------------------------------------------------------
+./doctor.sh || die "setup finished but the self-check above found a problem."
+say "Setup done. Fold the bundled sample with:  ./run.sh"
