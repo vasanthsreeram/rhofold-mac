@@ -101,7 +101,9 @@ The quick-start "prediction" time (2.3 s for the sample) is a single cold run in
 
 ## Experimental: MLX trunk
 
-`experimental/mlx_e2eformer.py` is an [MLX](https://github.com/ml-explore/mlx) port of RhoFold+'s E2Eformer trunk only (the 12 attention blocks), for comparing numerics and speed against PyTorch. It reads the PyTorch checkpoint at runtime; there are no converted MLX weights, and it does not produce structures. Use the PyTorch MPS runner above for predictions.
+`experimental/mlx_e2eformer.py` is an [MLX](https://github.com/ml-explore/mlx) port of RhoFold+'s E2Eformer trunk only (the 12 attention blocks), for comparing numerics and speed against PyTorch. It reads the PyTorch checkpoint at runtime; there are no converted MLX weights, and it does not produce structures.
+
+**It does not match PyTorch yet.** Its built-in check compares the trunk outputs against the official PyTorch trunk on the same inputs. On 2026-10-17 (fresh clone, M4) the relative error was 0.27–0.41 on the 52-nt sample and 0.36–0.65 on 4P8Z (188 nt), so there is a bug in the port and its timings mean nothing until that is fixed. Use the PyTorch MPS runner above for predictions.
 
 ```bash
 ./setup.sh --with-mlx

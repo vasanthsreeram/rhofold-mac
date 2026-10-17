@@ -4,6 +4,8 @@ Loads the official weights from the PyTorch checkpoint and reproduces
 rhofold.model.e2eformer.E2EformerStack.forward (inference path, inplace_safe=False,
 chunk_size=None) for batch 1 with no padding (all masks = 1, which is what inference.py uses).
 
+STATUS (2026-10-17): does NOT match the torch trunk yet (relative error ~0.3-0.6 in `check`); experimental, do not use for predictions.
+
 Usage: as a library (MLXE2Eformer), or `python mlx_e2eformer.py check|bench ...` (see __main__).
 """
 import math, os, sys, time
